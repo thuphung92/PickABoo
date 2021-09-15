@@ -1,29 +1,36 @@
 import './App.css';
 import { useState } from 'react';
-import { BrowserRouter as Router, Route, Switch, Link } from 'react-router-dom';
-import SearchParams from './views/SearchParams';
+import { BrowserRouter as Router, Route, Switch,} from 'react-router-dom';
+import Home from './views/Home';
 import Details from './views/Details';
-import ThemeContext from './ThemeContext';
-
+import ThemeContext from './context/ThemeContext';
+import UserContext from './context/UserContext';
+import NavBar from './components/NavBar';
+import Login from './views/Login';
+import Logout from './views/Logout';
+import MyFave from './views/MyFave';
+import Register from './views/Register';
 
 const App = () => {
-  const theme = useState('darkblue');
+  const theme = useState('light blue');
+  const [user, setUser] = useState('');
+
   return (
     <ThemeContext.Provider value={theme}>
       <div>      
         <Router>
-          <header>
-          <Link to="/">
-          <h1>Pick Me!</h1>
-          </Link>
-          </header>
+        <NavBar />
           <Switch>
-            <Route path="/details/:id">
-              <Details />
-            </Route>
-            <Route path="/">
-              <SearchParams />
-            </Route>
+            <Route exact path='/register'><Register /></Route>
+            <Route exact path="/"><Home /></Route>
+
+          <UserContext.Provider value={{user, setUser}}>
+              <Route exact path='/login'><Login /></Route>
+              <Route exact path="/details/:id"><Details /></Route>
+              <Route exact path='/myfave'><MyFave /></Route>
+              <Route exact path='/'><Logout /></Route>
+          </UserContext.Provider>
+
           </Switch>
         </Router>
       </div>
