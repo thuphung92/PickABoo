@@ -1,24 +1,24 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Card } from 'react-bootstrap'
 
 const Pet = ({name, animal, breed, photos, location,id}) => {   
     let alt = 'https://res.cloudinary.com/dci7rk8xe/image/upload/v1631432062/react_myboo/no-image-300X300_fu0uq0.png'
 
-    if (photos.length) {
+    if (photos !== null) {
         alt = photos
     }
 
     return (
-        <Link to={`/details/${id}`} className="pet">
-            <div className="image-container">
-                <img src={alt} alt={name} />
-            </div>
-            <div className="info">
-                <h1>{name}</h1>
-                <h2>
-                    {animal} - {breed} - {location}
-                </h2>
-            </div>
+        <Link style={{ textDecoration: 'none' }} to={`/details/${id}`} className="pet" >
+            <Card className='mb-5'>
+                <Card.Img  src={alt} alt={name} style={{width: '100%', height:'300px', objectFit: 'cover'}} />
+                <Card.Body variant='warning' style={{color: 'black', textAlign: 'center', textDecoration: 'none'}}>
+                    <Card.Title>{name}</Card.Title>
+                    <Card.Text>{animal} - {breed} - {location}</Card.Text>
+                    
+                </Card.Body>
+            </Card>
         </Link>
     )
 }

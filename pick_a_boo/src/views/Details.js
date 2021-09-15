@@ -1,13 +1,21 @@
+
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { Client } from '@petfinder/petfinder-js';
 import Carousel from '../components/Carousel';
 import ErrorBoundary from '../ErrorBoundary';
+import { Spinner, Card, Row, Col, Container, } from 'react-bootstrap'
+import FavoriteIcon from '@material-ui/icons/Favorite';
+import MailOutlineIcon from '@material-ui/icons/MailOutline';
+import CallIcon from '@material-ui/icons/Call';
 
 const client = new Client({apiKey: process.env.REACT_APP_API_KEY, secret: process.env.REACT_APP_API_SECRET});
 
 class Details extends Component {
-    state = { loading: true };
+    state = {
+        loading: true,
+        liked: false
+    };
    
     async componentDidMount() {
         const resp = await client.animal.show(this.props.match.params.id)
@@ -33,40 +41,99 @@ class Details extends Component {
             houseTrained: pet.attributes.house_trained === true ? "Yes" : "No",
             breed,
             media: pet.photos,
+            contact: pet.contact,
             loading: false
         });
     }
 
+    toggle = () => {
+        let didLike = this.state.liked;
+        didLike = !didLike;
+        this.setState({liked: didLike})
+    }
+
+
     render() {
 
         if (this.state.loading) {
-            return <h2>loading...</h2> // add loading spin later
+            return (
+                <div>
+                    <Container className='text-center'>
+                        <Spinner animation="border" role="status">
+                            <span className="visually-hidden">Loading...</span>
+                        </Spinner>
+                    </Container>
+                </div>
+            ) 
         }
 
-        const { name, animal, breed, age, size, gender, description, location, houseTrained, media } = this.state;
+        const { name, animal, breed, age, size, gender, description, location, houseTrained, media, contact } = this.state;
+
+        const styles={
+            btn:{
+                height: 'auto',
+                width: 'auto',
+                border: 'none',
+                backgroundColor:'white',
+                float: 'right'
+            }
+        }
        
         return (
-            <div className='details'>
-                <Carousel media={media}/>
-               <div>
-                    <h1>{name}</h1>
-                    <h3>{animal} - {breed} - {location} </h3>  
-                </div>
-                <div>
-                    <h3>{age} - {gender} - {size}</h3>
-                </div>
-                <div>
-                    <h2>About</h2>
-                    <div>
-                        <h4>CHARACTERISTICS</h4>
-                        {description}
-                    </div>
-                    <div>
-                        <h4>HOUSE-TRAINED</h4>
-                        { houseTrained }
-                    </div>
-                    <button>Adopt {name} </button>
-                </div>          
+            <div className='details mt-5'>
+                <Row>
+                    <Col md={4}>
+                        <div className='mt-5'>
+                        <Carousel media={media}/>
+                        </div>
+                    </Col>
+                    
+                    <Col md={6}>
+                        <div className='detail-box mb-5'>    
+                            <Card style={{padding: '50px'}}>
+                                <div style={{paddingBottom: '20px'}}>
+                                    <h1 className='mb-3'>{name}</h1>
+                                    <h3>{animal} - {breed} - {location} </h3>  
+                                </div>
+                                <hr/>
+                                <div>
+                                    <h4>{age} - {gender} - {size}</h4>
+                                </div>
+                                <hr/>
+                                <div style={{paddingBottom: '30px', paddingTop: '30px'}}>
+                                    <h2 className='mb-5'>About</h2>
+                                    <div className='mb-5'>
+                                        <h4>CHARACTERISTICS</h4>
+                                        {description}
+                                    </div>
+                                    <div className='mb-5'>
+                                        <h4>HOUSE-TRAINED</h4>
+                                        { houseTrained }
+                                    </div>
+                                    <div>
+                                        <h4>CONTACT</h4>
+                                        <div>
+                                            <MailOutlineIcon/> {contact.email}
+                                       </div>
+                                            <CallIcon/> {contact.phone}
+                                    </div>
+                                </div>
+                                    <span >
+                                        <button
+                                            style={styles.btn}
+                                            onClick={()=>this.toggle()}
+                                        >
+                                            <FavoriteIcon
+                                                color={this.state.liked? "secondary" : "disabled"}
+                                                style={{ fontSize: 40 }}
+                                            />
+                                        </button>
+                                    </span>
+                            </Card>
+                        </div>
+                    </Col>
+                   
+                </Row>          
             </div>
         )
     }
