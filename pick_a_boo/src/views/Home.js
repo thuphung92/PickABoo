@@ -2,10 +2,11 @@ import React from 'react';
 import useBreedList from '../components/useBreedList';
 import useAnimalList from '../components/useAnimalList';
 import { useState, useEffect, useContext } from 'react';
-import ThemeContext from '../context/ThemeContext';
 import { Client } from '@petfinder/petfinder-js';
 import Results from '../components/Results';
-import { Form, Row, Container, Col, Button, Card } from 'react-bootstrap'
+import { Form, Row, Container, Col, Button, Card } from 'react-bootstrap';
+import { Alert } from 'react-bootstrap';
+import { ErrorMessage} from '../components/ErrorMessage'
 
 
 const client = new Client({apiKey: process.env.REACT_APP_API_KEY, secret: process.env.REACT_APP_API_SECRET});
@@ -17,28 +18,41 @@ const Home = () => {
     const [pets, setPets] = useState([]);
     const [animals] = useAnimalList();
     const [breeds] = useBreedList(animal);
-    const [theme, setTheme] = useContext(ThemeContext);
+    const [errStatus, setErrStatus] = useState(null);
 
-    
+  
     useEffect(() => {
         getPets();
     },[])
     
     async function getPets() {
-        const resp = await client.animal.search({
-            type: `${animal}`,
-            location: `${location}`,
-            breed: `${breed}`,
-            status: 'adoptable',
-            sort: 'distance'
-        });
-        setPets(resp.data.animals);
+        
+        try {
+            const resp = await client.animal.search({
+                type: `${animal}`,
+                location: `${location}`,
+                breed: `${breed}`,
+                status: 'adoptable',
+                sort: 'distance'           
+            });
+            setPets(resp.data.animals);
+        }
+        catch (err) {
+            if(400 <= err.status < 500) {setErrStatus(400)}
+            else if(500 <= err.status < 600 ) {setErrStatus(500)}
+            else {console.error(err.status)}
+        }
+
+        //if(resp.status === 200) {setPets(resp.data.animals)};
+        //if(400 <= resp.status < 500) {setBadLocation(true)};
+        //if(500 <= resp.status < 600) {setServerError(true)}
+        
     }
 
 const styles={
             error:{color:'red'},
             wrapper:{
-                marginTop: '150px',
+                marginTop: '220px',
                 marginBottom: '50px',
                 display: 'flex',
                 justifyContent: 'center',
@@ -55,8 +69,10 @@ const styles={
         }
 
     return (
-        <div className="search-params">
-            
+        <div className="search-params">         
+            {errStatus === 400 && <Alert variant = 'danger'>Please Enter A Valid Location!<br/> Tips: A valid Zip Code is also acceptable!</Alert>}
+            {errStatus === 500 && <Alert variant = 'info'>There was an error happen while trying to connect to the server. Please try again.</Alert>}
+
             <Card className="bg-dark text-black ">
                 <Card.Img src="https://res.cloudinary.com/dci7rk8xe/image/upload/c_crop,h_250,w_1100/v1631606822/react_myboo/6_nar5sx.jpg" alt="Card image" />
                 
@@ -124,7 +140,7 @@ const styles={
                         </Form.Label>
                         </Form.Group>
                     </Row>
-                    <Button variant="warning" type="submit" style={{ backgroundColor: theme }}>Submit</Button >
+                    <Button variant="warning" type="submit">Submit</Button >
                 </Form>
                 </div>
                 </div>
