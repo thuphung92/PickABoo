@@ -1,6 +1,5 @@
-
 import React, { Component } from 'react';
-import { withRouter } from 'react-router-dom';
+import { withRouter, Link } from 'react-router-dom';
 import { Client } from '@petfinder/petfinder-js';
 import Carousel from '../components/Carousel';
 import ErrorBoundary from '../ErrorBoundary';
@@ -8,6 +7,7 @@ import { Spinner, Card, Row, Col, Container, } from 'react-bootstrap'
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import MailOutlineIcon from '@material-ui/icons/MailOutline';
 import CallIcon from '@material-ui/icons/Call';
+import UserContext from '../context/UserContext';
 
 const client = new Client({apiKey: process.env.REACT_APP_API_KEY, secret: process.env.REACT_APP_API_SECRET});
 
@@ -16,20 +16,23 @@ class Details extends Component {
         loading: true,
         liked: false
     };
-   
+
+    static contextType = UserContext
+ 
     async componentDidMount() {
+        
         const resp = await client.animal.show(this.props.match.params.id)
         const pet = resp.data.animal
-
+        
         let breed;
-            if (pet.breeds.unknown) {
-                breed = 'unknown'
-            } else if (pet.breeds.mixed === true) {
-                breed = `${pet.breeds.primary}, ${pet.breeds.secondary}`
-            } else {
-                breed = pet.breeds.primary
-            }
-
+        if (pet.breeds.unknown) {
+            breed = 'unknown'
+        } else if (pet.breeds.mixed === true) {
+            breed = `${pet.breeds.primary}, ${pet.breeds.secondary}`
+        } else {
+            breed = pet.breeds.primary
+        }
+        
         this.setState({
             name : pet.name,
             animal: pet.type,
@@ -44,6 +47,7 @@ class Details extends Component {
             contact: pet.contact,
             loading: false
         });
+        const {user} = this.context
     }
 
     toggle = () => {
@@ -52,9 +56,7 @@ class Details extends Component {
         this.setState({liked: didLike})
     }
 
-
     render() {
-
         if (this.state.loading) {
             return (
                 <div>
@@ -112,10 +114,17 @@ class Details extends Component {
                                     </div>
                                     <div>
                                         <h4>CONTACT</h4>
-                                        <div>
-                                            <MailOutlineIcon/> {contact.email}
-                                       </div>
-                                            <CallIcon/> {contact.phone}
+                                            {this.context.user !== null?
+                                                <>
+                                                    <div>
+                                                        <MailOutlineIcon/> {contact.email}
+                                                    </div>
+                                                        <CallIcon/> {contact.phone}
+                                                </>
+                                            :
+                                            <p>
+                                                Please <Link to={{pathname:"/login"}}>Login</Link> to View This Information!
+                                            </p>}
                                     </div>
                                 </div>
                                     <span >

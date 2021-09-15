@@ -3,7 +3,8 @@ import * as Yup from 'yup';
 import {Formik, Form, Field} from 'formik';
 import { Col, Button, Alert} from 'react-bootstrap';
 import { Link, Redirect } from 'react-router-dom';
-import { getToken } from '../api/apiClient'
+import { getToken } from '../api/apiClient';
+import UserContext from '../context/UserContext';
 
 
 const loginFormSchema = Yup.object().shape({
@@ -27,24 +28,17 @@ export default class Login extends Component {
         }
     }
     
+    static contextType = UserContext
+    componentDidMount(){
+        const {user, setUser} = this.context
+    }
     
     handleSubmit=async ({email, password})=>{
         const res = await getToken(email, password);
         if (res ===401){return this.setState({badLogin:true, serverError:false})};
         if (res ===500){return this.setState({badLogin:false, serverError:true})};
-        console.log(res);
-        const token = res.token
-        const user = res.user
-        const user_id = res.user_id
 
-        localStorage.setItem('token', token);
-        this.props.setToken(token);
-
-        localStorage.setItem('user', user);
-        this.props.setUser(user)
-
-        localStorage.setItem('user_id', user_id);
-        this.props.setUserId(user_id)
+        this.context.setUser(res)
 
         this.setState({redirect:true})
     }
