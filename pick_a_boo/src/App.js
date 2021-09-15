@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { BrowserRouter as Router, Route, Switch,} from 'react-router-dom';
 import Home from './views/Home';
 import Details from './views/Details';
-import ThemeContext from './context/ThemeContext';
 import UserContext from './context/UserContext';
 import NavBar from './components/NavBar';
 import Login from './views/Login';
@@ -13,28 +12,28 @@ import Register from './views/Register';
 
 const App = () => {
   const theme = useState('light blue');
-  const [user, setUser] = useState('');
+  const [user, setUser] = useState(null);
 
   return (
-    <ThemeContext.Provider value={theme}>
-      <div>      
-        <Router>
+    <div>      
+      <Router>
+      <UserContext.Provider value={{user, setUser}}>
         <NavBar />
-          <Switch>
-            <Route exact path='/register'><Register /></Route>
-            <Route exact path="/"><Home /></Route>
+      </UserContext.Provider>
+        <Switch>
+          <Route exact path='/register'><Register /></Route>
+          <Route exact path="/"><Home /></Route>
 
-          <UserContext.Provider value={{user, setUser}}>
-              <Route exact path='/login'><Login /></Route>
-              <Route exact path="/details/:id"><Details /></Route>
-              <Route exact path='/myfave'><MyFave /></Route>
-              <Route exact path='/'><Logout /></Route>
-          </UserContext.Provider>
+        <UserContext.Provider value={{user, setUser}}>
+          <Route exact path='/login'><Login /></Route>
+          <Route exact path="/details/:id"><Details /></Route>
+          <Route exact path='/myfave'><MyFave /></Route>
+          <Route exact path='/'><Logout /></Route>
+        </UserContext.Provider>
 
-          </Switch>
-        </Router>
-      </div>
-    </ThemeContext.Provider>
+        </Switch>
+      </Router>
+    </div>
   );
 }
 
