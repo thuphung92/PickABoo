@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { Container, Row, Col } from 'react-bootstrap'
 
 export default class Carousel extends Component {
 
@@ -23,17 +24,26 @@ export default class Carousel extends Component {
             : [];
         return (
             <div className="carousel">
-                <img src={photos[active]} alt="primary animal" />
-                <div className="carousel-smaller">
-                    {photos.map((photo, index) => (
-                        <img
-                            onClick={this.handleIndexClick}
-                            key={photo} src={photo}
-                            className = { index === active ? 'active' : '' }
-                            alt='animal thumbnail'
-                            data-index = {index}
-                        />
-                    ))}
+                <div className='text-center mb-4'>
+                    <img src={photos[active]} alt="primary animal" />
+                </div>
+                <div className="carousel-smaller text-center">
+                    <Container className='mt-5 mb-3'>
+                        <Row>
+                            {photos.map((photo, index) => (
+                                <Col md={2} key={photo}>
+                                <img
+                                    onClick={this.handleIndexClick}
+                                    key={photo} src={photo}
+                                    className = { index === active ? 'active' : '' }
+                                    alt='animal thumbnail'
+                                    data-index = {index}
+                                    style={{height: '100px', width:'100%', objectFit:'contain'}}
+                                />
+                                </Col>
+                            ))}
+                        </Row>
+                    </Container>
                 </div>
             </div>
         )

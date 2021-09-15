@@ -20,7 +20,8 @@ export default function useBreedList(animal) {
         }
 
         async function getBreedList() {
-            setBreedList([]); //to clear the list of the previous state if it exists
+            //clear the list of the previous state if it exists
+            setBreedList([]); 
             setStatus ('loading');
     
             const resp = await client.animalData.breeds(`${ animal }`).then(resp =>{
