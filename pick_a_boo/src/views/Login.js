@@ -9,7 +9,7 @@ import UserContext from '../context/UserContext';
 
 const loginFormSchema = Yup.object().shape({
     "email": Yup.string().email("Must be a valid e-mail format").required('Required'),
-    "password": Yup.string().required('')
+    "password": Yup.string().min(6).required('')
 })
 
 const loginFormInitialValues={
@@ -33,7 +33,7 @@ export default class Login extends Component {
         const {user, setUser} = this.context
     }
     
-    handleSubmit=async ({email, password})=>{
+    handleSubmit=async ({email, password})=>{     
         const res = await getToken(email, password);
         if (res ===401){return this.setState({badLogin:true, serverError:false})};
         if (res ===500){return this.setState({badLogin:false, serverError:true})};
@@ -69,7 +69,7 @@ export default class Login extends Component {
                 <div className="wrapper" style={styles.wrapper}>
                     <div className="container" style={styles.container}> 
                                                                   
-                        {this.state.redirect ? <Redirect to={{pathname:"/", props:{token:localStorage.getItem("token")} }}/>:''}
+                        {this.state.redirect ? <Redirect to={{pathname:"/" }}/>:''}
 
                             <Formik 
                                 initialValues={loginFormInitialValues}
@@ -84,7 +84,7 @@ export default class Login extends Component {
                                         <label htmlFor="email" className="form-label">Email</label>
                                         <Field name="email" className="form-control"/>
 
-                                        {errors.email && touched.email ? (<div style={styles.error}>{errors.username}</div>):null}
+                                        {errors.email && touched.email ? (<div style={styles.error}>{errors.email}</div>):null}
 
                                         <label htmlFor="password" className="form-label">Password</label>
                                         <Field name="password" className="form-control" type="password"/>
