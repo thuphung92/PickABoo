@@ -1,19 +1,17 @@
-import React, { useContext } from 'react'
+import React, { useEffect } from 'react'
 import UserContext from '../context/UserContext';
 
 function Logout() {
-    const {user, setUser} = useContext(UserContext);
+    const {user, setUser} = props
+    useEffect(() => {
+        console.log(props.user)
+    },[])
 
     return (
         <div>
-            {user !== null? ()=>{
-                setUser(null);
-                <div>
-                    Thanks for your visit! See you soon!
-                    <Redirect to={{pathname: '/'}}/>
-                </div>
-            } 
-            : null}
+            {console.log(props.user)}          
+            Thanks for your visit! See you soon!
+            /*<Redirect to={{pathname: '/'}}/> */     
         </div>
     )
 }
